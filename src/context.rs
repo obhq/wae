@@ -22,7 +22,7 @@ pub struct Context<'a> {
     pub blocking: &'a mut FxHashMap<WindowId, NonZero<usize>>,
 }
 
-impl<'a> Context<'a> {
+impl Context<'_> {
     /// # Panics
     /// - If called from the other thread than main thread.
     /// - If this call has been nested.
@@ -66,7 +66,7 @@ impl<'a, 'b> Lock<'a, 'b> {
     }
 }
 
-impl<'a, 'b> Drop for Lock<'a, 'b> {
+impl Drop for Lock<'_, '_> {
     fn drop(&mut self) {
         CONTEXT.set(null_mut());
         LOCK.set(false);

@@ -22,7 +22,7 @@ impl<'a, W: WinitWindow> Blocker<'a, W> {
     }
 }
 
-impl<'a, W: WinitWindow> Drop for Blocker<'a, W> {
+impl<W: WinitWindow> Drop for Blocker<'_, W> {
     fn drop(&mut self) {
         use std::collections::hash_map::Entry;
 

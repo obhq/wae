@@ -40,7 +40,7 @@ pub struct WaitForSignal<'a, T> {
     waker: Option<Waker>,
 }
 
-impl<'a, T> Drop for WaitForSignal<'a, T> {
+impl<T> Drop for WaitForSignal<'_, T> {
     fn drop(&mut self) {
         // We need a full Waker instead of its data so we don't accidentally remove a wrong waker if
         // it already been freed somehow.
