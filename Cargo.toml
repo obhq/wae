@@ -1,6 +1,9 @@
 [package]
 name = "wae"
+description = "Async executor that use Winit event loop"
 version = "0.1.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/obhq/wae"
 edition = "2021"
 
 [dependencies]
