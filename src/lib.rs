@@ -186,7 +186,7 @@ pub fn register_global(obj: Rc<dyn Any>) {
     Context::with(move |cx| assert!(cx.objects.as_mut().unwrap().insert(id, obj).is_none()))
 }
 
-/// Returns an object that was registered with [`register()`].
+/// Returns an object that was registered with [`register_global()`].
 ///
 /// # Panics
 /// - If called from the other thread than main thread.
