@@ -7,27 +7,60 @@ use winit::window::WindowId;
 ///
 /// The event loop will exit immediately if any method return an error.
 pub trait WindowHandler: WinitWindow {
-    fn on_resized(&self, new: PhysicalSize<u32>) -> Result<(), Box<dyn Error + Send + Sync>>;
-    fn on_close_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>>;
-    fn on_focused(&self, gained: bool) -> Result<(), Box<dyn Error + Send + Sync>>;
+    fn on_resized(&self, new: PhysicalSize<u32>) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = new;
+        Ok(())
+    }
+
+    fn on_close_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>> {
+        Ok(())
+    }
+
+    fn on_focused(&self, gained: bool) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = gained;
+        Ok(())
+    }
+
     fn on_cursor_moved(
         &self,
         dev: DeviceId,
         pos: PhysicalPosition<f64>,
-    ) -> Result<(), Box<dyn Error + Send + Sync>>;
-    fn on_cursor_left(&self, dev: DeviceId) -> Result<(), Box<dyn Error + Send + Sync>>;
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = pos;
+        let _ = dev;
+        Ok(())
+    }
+
+    fn on_cursor_left(&self, dev: DeviceId) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = dev;
+        Ok(())
+    }
+
     fn on_mouse_input(
         &self,
         dev: DeviceId,
         st: ElementState,
         btn: MouseButton,
-    ) -> Result<(), Box<dyn Error + Send + Sync>>;
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = btn;
+        let _ = st;
+        let _ = dev;
+        Ok(())
+    }
+
     fn on_scale_factor_changed(
         &self,
         new: f64,
         sw: InnerSizeWriter,
-    ) -> Result<(), Box<dyn Error + Send + Sync>>;
-    fn on_redraw_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>>;
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = sw;
+        let _ = new;
+        Ok(())
+    }
+
+    fn on_redraw_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>> {
+        Ok(())
+    }
 }
 
 /// Provides method to return winit properties.
