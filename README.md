@@ -1,4 +1,5 @@
 # Winit Aync Executor
+[![Crates.io Version](https://img.shields.io/crates/v/wae)](https://crates.io/crates/wae)
 
 WAE is an async executor that use Winit event loop to drive the future that is ready to run.
 
