@@ -89,6 +89,12 @@ impl WindowHandler for MyWindow {
 }
 ```
 
+## Breaking changes
+
+### 0.1 to 0.2
+
+- `RuntimeError` was renamed to `Error`.
+
 ## License
 
 Licensed under either of

@@ -10,7 +10,6 @@ use rustc_hash::FxHashMap;
 use std::any::{Any, TypeId};
 use std::cell::Cell;
 use std::collections::HashMap;
-use std::error::Error;
 use std::future::Future;
 use std::num::NonZero;
 use std::rc::{Rc, Weak};
@@ -37,11 +36,11 @@ mod window;
 /// async executor will not work with Tokio by default.
 ///
 /// To create a window, call [`create_window()`] from `main` future.
-pub fn run<T: 'static>(main: impl Future<Output = T> + 'static) -> Result<T, RuntimeError> {
+pub fn run<T: 'static>(main: impl Future<Output = T> + 'static) -> Result<T, Error> {
     // Setup winit event loop.
     let mut el = EventLoop::<Event>::with_user_event();
-    let el = el.build().map_err(RuntimeError::CreateEventLoop)?;
-    let exit: Rc<Cell<Option<Result<T, RuntimeError>>>> = Rc::default();
+    let el = el.build().map_err(Error::CreateEventLoop)?;
+    let exit: Rc<Cell<Option<Result<T, Error>>>> = Rc::default();
     let main = {
         let exit = exit.clone();
 
@@ -67,7 +66,7 @@ pub fn run<T: 'static>(main: impl Future<Output = T> + 'static) -> Result<T, Run
         exit,
     };
 
-    el.run_app(&mut rt).map_err(RuntimeError::RunEventLoop)?;
+    el.run_app(&mut rt).map_err(Error::RunEventLoop)?;
 
     rt.exit.take().unwrap()
 }
@@ -252,7 +251,7 @@ struct Runtime<T> {
     hooks: Vec<Rc<dyn Hook>>,
     windows: FxHashMap<WindowId, Weak<dyn WindowHandler>>,
     blocking: FxHashMap<WindowId, NonZero<usize>>,
-    exit: Rc<Cell<Option<Result<T, RuntimeError>>>>,
+    exit: Rc<Cell<Option<Result<T, Error>>>>,
 }
 
 impl<T> Runtime<T> {
@@ -304,7 +303,7 @@ impl<T> Runtime<T> {
         true
     }
 
-    fn exit(&mut self, el: &ActiveEventLoop, r: Result<T, RuntimeError>) {
+    fn exit(&mut self, el: &ActiveEventLoop, r: Result<T, Error>) {
         self.exit.set(Some(r));
         el.exit();
     }
@@ -329,7 +328,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
             Ok(())
         }) {
-            self.exit(el, Err(RuntimeError::NewEvents(e)));
+            self.exit(el, Err(Error::NewEvents(e)));
         }
     }
 
@@ -372,7 +371,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
             Ok(())
         }) {
-            self.exit(el, Err(RuntimeError::PreWindowEvent(e)));
+            self.exit(el, Err(Error::PreWindowEvent(e)));
             return;
         }
 
@@ -401,20 +400,20 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
         // Process the event.
         let r = match event {
             WindowEvent::Resized(v) => {
-                dispatch!(w => w.on_resized(v).map_err(RuntimeError::Resized))
+                dispatch!(w => w.on_resized(v).map_err(Error::Resized))
             }
-            WindowEvent::Moved(v) => dispatch!(w => w.on_moved(v).map_err(RuntimeError::Moved)),
+            WindowEvent::Moved(v) => dispatch!(w => w.on_moved(v).map_err(Error::Moved)),
             WindowEvent::CloseRequested => match self.blocking.contains_key(&id) {
                 true => Ok(()),
                 false => {
-                    dispatch!(w => w.on_close_requested().map_err(RuntimeError::CloseRequested))
+                    dispatch!(w => w.on_close_requested().map_err(Error::CloseRequested))
                 }
             },
             WindowEvent::Destroyed => {
                 // Run hook.
                 let r = cx.run(|| {
                     for h in &mut self.hooks {
-                        h.window_destroyed(id).map_err(RuntimeError::Destroyed)?;
+                        h.window_destroyed(id).map_err(Error::Destroyed)?;
                     }
 
                     Ok(())
@@ -431,14 +430,14 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
                 r
             }
             WindowEvent::Focused(v) => {
-                dispatch!(w => w.on_focused(v).map_err(RuntimeError::Focused))
+                dispatch!(w => w.on_focused(v).map_err(Error::Focused))
             }
             WindowEvent::CursorMoved {
                 device_id: dev,
                 position: pos,
-            } => dispatch!(w => w.on_cursor_moved(dev, pos).map_err(RuntimeError::CursorMoved)),
+            } => dispatch!(w => w.on_cursor_moved(dev, pos).map_err(Error::CursorMoved)),
             WindowEvent::CursorLeft { device_id: dev } => {
-                dispatch!(w => w.on_cursor_left(dev).map_err(RuntimeError::CursorLeft))
+                dispatch!(w => w.on_cursor_left(dev).map_err(Error::CursorLeft))
             }
             WindowEvent::MouseInput {
                 device_id: dev,
@@ -447,17 +446,17 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => match self.blocking.contains_key(&id) {
                 true => Ok(()),
                 false => {
-                    dispatch!(w => w.on_mouse_input(dev, st, btn).map_err(RuntimeError::MouseInput))
+                    dispatch!(w => w.on_mouse_input(dev, st, btn).map_err(Error::MouseInput))
                 }
             },
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new,
                 inner_size_writer: sw,
             } => {
-                dispatch!(w => w.on_scale_factor_changed(new, sw).map_err(RuntimeError::ScaleFactorChanged))
+                dispatch!(w => w.on_scale_factor_changed(new, sw).map_err(Error::ScaleFactorChanged))
             }
             WindowEvent::RedrawRequested => {
-                dispatch!(w => w.on_redraw_requested().map_err(RuntimeError::RedrawRequested))
+                dispatch!(w => w.on_redraw_requested().map_err(Error::RedrawRequested))
             }
             _ => Ok(()),
         };
@@ -485,7 +484,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
             Ok(())
         }) {
-            self.exit(el, Err(RuntimeError::PostWindowEvent(e)));
+            self.exit(el, Err(Error::PostWindowEvent(e)));
         }
     }
 
@@ -532,7 +531,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
             Ok(())
         }) {
-            self.exit(el, Err(RuntimeError::AboutToWait(e)));
+            self.exit(el, Err(Error::AboutToWait(e)));
             return;
         }
 
@@ -578,10 +577,10 @@ enum Event {
     TaskReady(u64),
 }
 
-/// Represents an error when an operation on the runtime fails.
+/// Represents an error when [`run()`] fails.
 #[non_exhaustive]
 #[derive(Debug, Error)]
-pub enum RuntimeError {
+pub enum Error {
     #[error("couldn't create event loop")]
     CreateEventLoop(#[source] EventLoopError),
 
@@ -589,44 +588,44 @@ pub enum RuntimeError {
     RunEventLoop(#[source] EventLoopError),
 
     #[error("couldn't handle event loop wakeup event")]
-    NewEvents(#[source] Box<dyn Error + Send + Sync>),
+    NewEvents(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window event")]
-    PreWindowEvent(#[source] Box<dyn Error + Send + Sync>),
+    PreWindowEvent(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window resized")]
-    Resized(#[source] Box<dyn Error + Send + Sync>),
+    Resized(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window moved")]
-    Moved(#[source] Box<dyn Error + Send + Sync>),
+    Moved(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window close requested")]
-    CloseRequested(#[source] Box<dyn Error + Send + Sync>),
+    CloseRequested(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window destroyed")]
-    Destroyed(#[source] Box<dyn Error + Send + Sync>),
+    Destroyed(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window focused")]
-    Focused(#[source] Box<dyn Error + Send + Sync>),
+    Focused(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle cursor moved")]
-    CursorMoved(#[source] Box<dyn Error + Send + Sync>),
+    CursorMoved(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle cursor left")]
-    CursorLeft(#[source] Box<dyn Error + Send + Sync>),
+    CursorLeft(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle mouse input")]
-    MouseInput(#[source] Box<dyn Error + Send + Sync>),
+    MouseInput(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle scale factor changed")]
-    ScaleFactorChanged(#[source] Box<dyn Error + Send + Sync>),
+    ScaleFactorChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle redraw requested")]
-    RedrawRequested(#[source] Box<dyn Error + Send + Sync>),
+    RedrawRequested(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window event")]
-    PostWindowEvent(#[source] Box<dyn Error + Send + Sync>),
+    PostWindowEvent(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle about to wait event")]
-    AboutToWait(#[source] Box<dyn Error + Send + Sync>),
+    AboutToWait(#[source] Box<dyn std::error::Error + Send + Sync>),
 }
