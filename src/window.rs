@@ -12,6 +12,11 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_moved(&self, new: PhysicalPosition<i32>) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = new;
+        Ok(())
+    }
+
     fn on_close_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }

@@ -378,7 +378,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
         // Setup macro to dispatch event.
         macro_rules! dispatch {
-            ($w:ident => $h:block) => {
+            ($w:ident => $h:expr) => {
                 match win {
                     Some($w) => {
                         let mut cx = Context {
@@ -401,12 +401,13 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
         // Process the event.
         let r = match event {
             WindowEvent::Resized(v) => {
-                dispatch!(w => { w.on_resized(v).map_err(RuntimeError::Resized) })
+                dispatch!(w => w.on_resized(v).map_err(RuntimeError::Resized))
             }
+            WindowEvent::Moved(v) => dispatch!(w => w.on_moved(v).map_err(RuntimeError::Moved)),
             WindowEvent::CloseRequested => match self.blocking.contains_key(&id) {
                 true => Ok(()),
                 false => {
-                    dispatch!(w => { w.on_close_requested().map_err(RuntimeError::CloseRequested) })
+                    dispatch!(w => w.on_close_requested().map_err(RuntimeError::CloseRequested))
                 }
             },
             WindowEvent::Destroyed => {
@@ -430,14 +431,14 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
                 r
             }
             WindowEvent::Focused(v) => {
-                dispatch!(w => { w.on_focused(v).map_err(RuntimeError::Focused) })
+                dispatch!(w => w.on_focused(v).map_err(RuntimeError::Focused))
             }
             WindowEvent::CursorMoved {
                 device_id: dev,
                 position: pos,
-            } => dispatch!(w => { w.on_cursor_moved(dev, pos).map_err(RuntimeError::CursorMoved) }),
+            } => dispatch!(w => w.on_cursor_moved(dev, pos).map_err(RuntimeError::CursorMoved)),
             WindowEvent::CursorLeft { device_id: dev } => {
-                dispatch!(w => { w.on_cursor_left(dev).map_err(RuntimeError::CursorLeft) })
+                dispatch!(w => w.on_cursor_left(dev).map_err(RuntimeError::CursorLeft))
             }
             WindowEvent::MouseInput {
                 device_id: dev,
@@ -446,17 +447,17 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => match self.blocking.contains_key(&id) {
                 true => Ok(()),
                 false => {
-                    dispatch!(w => { w.on_mouse_input(dev, st, btn).map_err(RuntimeError::MouseInput) })
+                    dispatch!(w => w.on_mouse_input(dev, st, btn).map_err(RuntimeError::MouseInput))
                 }
             },
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new,
                 inner_size_writer: sw,
             } => {
-                dispatch!(w => { w.on_scale_factor_changed(new, sw).map_err(RuntimeError::ScaleFactorChanged) })
+                dispatch!(w => w.on_scale_factor_changed(new, sw).map_err(RuntimeError::ScaleFactorChanged))
             }
             WindowEvent::RedrawRequested => {
-                dispatch!(w => { w.on_redraw_requested().map_err(RuntimeError::RedrawRequested) })
+                dispatch!(w => w.on_redraw_requested().map_err(RuntimeError::RedrawRequested))
             }
             _ => Ok(()),
         };
@@ -578,6 +579,7 @@ enum Event {
 }
 
 /// Represents an error when an operation on the runtime fails.
+#[non_exhaustive]
 #[derive(Debug, Error)]
 pub enum RuntimeError {
     #[error("couldn't create event loop")]
@@ -594,6 +596,9 @@ pub enum RuntimeError {
 
     #[error("couldn't handle window resized")]
     Resized(#[source] Box<dyn Error + Send + Sync>),
+
+    #[error("couldn't handle window moved")]
+    Moved(#[source] Box<dyn Error + Send + Sync>),
 
     #[error("couldn't handle window close requested")]
     CloseRequested(#[source] Box<dyn Error + Send + Sync>),
