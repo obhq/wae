@@ -456,6 +456,9 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
                 device_id: dev,
                 position: pos,
             } => dispatch!(w => w.on_cursor_moved(dev, pos).map_err(Error::CursorMoved)),
+            WindowEvent::CursorEntered { device_id: dev } => {
+                dispatch!(w => w.on_cursor_entered(dev).map_err(Error::CursorEntered))
+            }
             WindowEvent::CursorLeft { device_id: dev } => {
                 dispatch!(w => w.on_cursor_left(dev).map_err(Error::CursorLeft))
             }
@@ -648,6 +651,9 @@ pub enum Error {
 
     #[error("couldn't handle cursor moved")]
     CursorMoved(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle cursor entered")]
+    CursorEntered(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle cursor left")]
     CursorLeft(#[source] Box<dyn std::error::Error + Send + Sync>),

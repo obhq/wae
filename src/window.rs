@@ -75,6 +75,11 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_cursor_entered(&self, dev: DeviceId) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = dev;
+        Ok(())
+    }
+
     fn on_cursor_left(&self, dev: DeviceId) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = dev;
         Ok(())
