@@ -451,6 +451,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             WindowEvent::ModifiersChanged(v) => {
                 dispatch!(w => w.on_modifiers_changed(v).map_err(Error::ModifiersChanged))
             }
+            WindowEvent::Ime(v) => dispatch!(w => w.on_ime(v).map_err(Error::Ime)),
             WindowEvent::CursorMoved {
                 device_id: dev,
                 position: pos,
@@ -641,6 +642,9 @@ pub enum Error {
 
     #[error("couldn't handle keyboard modifiers changed")]
     ModifiersChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle input method event")]
+    Ime(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle cursor moved")]
     CursorMoved(#[source] Box<dyn std::error::Error + Send + Sync>),

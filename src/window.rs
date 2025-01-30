@@ -1,7 +1,9 @@
 use std::error::Error;
 use std::path::PathBuf;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
-use winit::event::{DeviceId, ElementState, InnerSizeWriter, KeyEvent, Modifiers, MouseButton};
+use winit::event::{
+    DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
+};
 use winit::window::WindowId;
 
 /// Encapsulates winit window with window-specific logic.
@@ -55,6 +57,11 @@ pub trait WindowHandler: WinitWindow {
 
     fn on_modifiers_changed(&self, m: Modifiers) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = m;
+        Ok(())
+    }
+
+    fn on_ime(&self, ev: Ime) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = ev;
         Ok(())
     }
 
