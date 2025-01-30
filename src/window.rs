@@ -27,6 +27,11 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_hovered_file(&self, path: PathBuf) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = path;
+        Ok(())
+    }
+
     fn on_focused(&self, gained: bool) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = gained;
         Ok(())
