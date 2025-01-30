@@ -32,6 +32,10 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_hovered_file_cancelled(&self) -> Result<(), Box<dyn Error + Send + Sync>> {
+        Ok(())
+    }
+
     fn on_focused(&self, gained: bool) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = gained;
         Ok(())

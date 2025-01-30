@@ -435,6 +435,9 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             WindowEvent::HoveredFile(v) => {
                 dispatch!(w => w.on_hovered_file(v).map_err(Error::HoveredFile))
             }
+            WindowEvent::HoveredFileCancelled => {
+                dispatch!(w => w.on_hovered_file_cancelled().map_err(Error::HoveredFileCancelled))
+            }
             WindowEvent::Focused(v) => {
                 dispatch!(w => w.on_focused(v).map_err(Error::Focused))
             }
@@ -616,6 +619,9 @@ pub enum Error {
 
     #[error("couldn't handle file hovered")]
     HoveredFile(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle hovered file cancelled")]
+    HoveredFileCancelled(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window focused")]
     Focused(#[source] Box<dyn std::error::Error + Send + Sync>),
