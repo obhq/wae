@@ -448,6 +448,9 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => {
                 dispatch!(w => w.on_keyboard_input(dev, event, synth).map_err(Error::KeyboardInput))
             }
+            WindowEvent::ModifiersChanged(v) => {
+                dispatch!(w => w.on_modifiers_changed(v).map_err(Error::ModifiersChanged))
+            }
             WindowEvent::CursorMoved {
                 device_id: dev,
                 position: pos,
@@ -635,6 +638,9 @@ pub enum Error {
 
     #[error("couldn't handle keyboard input")]
     KeyboardInput(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle keyboard modifiers changed")]
+    ModifiersChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle cursor moved")]
     CursorMoved(#[source] Box<dyn std::error::Error + Send + Sync>),
