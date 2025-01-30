@@ -429,6 +429,9 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
                 r
             }
+            WindowEvent::DroppedFile(v) => {
+                dispatch!(w => w.on_dropped_file(v).map_err(Error::DroppedFile))
+            }
             WindowEvent::Focused(v) => {
                 dispatch!(w => w.on_focused(v).map_err(Error::Focused))
             }
@@ -604,6 +607,9 @@ pub enum Error {
 
     #[error("couldn't handle window destroyed")]
     Destroyed(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle file dropped")]
+    DroppedFile(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window focused")]
     Focused(#[source] Box<dyn std::error::Error + Send + Sync>),

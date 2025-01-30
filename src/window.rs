@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::path::PathBuf;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::event::{DeviceId, ElementState, InnerSizeWriter, MouseButton};
 use winit::window::WindowId;
@@ -18,6 +19,11 @@ pub trait WindowHandler: WinitWindow {
     }
 
     fn on_close_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>> {
+        Ok(())
+    }
+
+    fn on_dropped_file(&self, path: PathBuf) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = path;
         Ok(())
     }
 
