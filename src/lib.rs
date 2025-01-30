@@ -441,6 +441,13 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             WindowEvent::Focused(v) => {
                 dispatch!(w => w.on_focused(v).map_err(Error::Focused))
             }
+            WindowEvent::KeyboardInput {
+                device_id: dev,
+                event,
+                is_synthetic: synth,
+            } => {
+                dispatch!(w => w.on_keyboard_input(dev, event, synth).map_err(Error::KeyboardInput))
+            }
             WindowEvent::CursorMoved {
                 device_id: dev,
                 position: pos,
@@ -625,6 +632,9 @@ pub enum Error {
 
     #[error("couldn't handle window focused")]
     Focused(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle keyboard input")]
+    KeyboardInput(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle cursor moved")]
     CursorMoved(#[source] Box<dyn std::error::Error + Send + Sync>),

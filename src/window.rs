@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::path::PathBuf;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
-use winit::event::{DeviceId, ElementState, InnerSizeWriter, MouseButton};
+use winit::event::{DeviceId, ElementState, InnerSizeWriter, KeyEvent, MouseButton};
 use winit::window::WindowId;
 
 /// Encapsulates winit window with window-specific logic.
@@ -38,6 +38,18 @@ pub trait WindowHandler: WinitWindow {
 
     fn on_focused(&self, gained: bool) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = gained;
+        Ok(())
+    }
+
+    fn on_keyboard_input(
+        &self,
+        dev: DeviceId,
+        event: KeyEvent,
+        is_synthetic: bool,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = is_synthetic;
+        let _ = event;
+        let _ = dev;
         Ok(())
     }
 
