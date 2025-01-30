@@ -110,6 +110,18 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_pinch_gesture(
+        &self,
+        dev: DeviceId,
+        delta: f64,
+        phase: TouchPhase,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = phase;
+        let _ = delta;
+        let _ = dev;
+        Ok(())
+    }
+
     fn on_scale_factor_changed(
         &self,
         new: f64,
