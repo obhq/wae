@@ -462,6 +462,13 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             WindowEvent::CursorLeft { device_id: dev } => {
                 dispatch!(w => w.on_cursor_left(dev).map_err(Error::CursorLeft))
             }
+            WindowEvent::MouseWheel {
+                device_id: dev,
+                delta,
+                phase,
+            } => {
+                dispatch!(w => w.on_mouse_wheel(dev, delta, phase).map_err(Error::MouseWheel))
+            }
             WindowEvent::MouseInput {
                 device_id: dev,
                 state: st,
@@ -657,6 +664,9 @@ pub enum Error {
 
     #[error("couldn't handle cursor left")]
     CursorLeft(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle mouse wheel")]
+    MouseWheel(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle mouse input")]
     MouseInput(#[source] Box<dyn std::error::Error + Send + Sync>),

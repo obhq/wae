@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::event::{
     DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
+    MouseScrollDelta, TouchPhase,
 };
 use winit::window::WindowId;
 
@@ -81,6 +82,18 @@ pub trait WindowHandler: WinitWindow {
     }
 
     fn on_cursor_left(&self, dev: DeviceId) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = dev;
+        Ok(())
+    }
+
+    fn on_mouse_wheel(
+        &self,
+        dev: DeviceId,
+        delta: MouseScrollDelta,
+        phase: TouchPhase,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = phase;
+        let _ = delta;
         let _ = dev;
         Ok(())
     }
