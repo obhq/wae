@@ -134,6 +134,11 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_double_tap_gesture(&self, dev: DeviceId) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = dev;
+        Ok(())
+    }
+
     fn on_scale_factor_changed(
         &self,
         new: f64,

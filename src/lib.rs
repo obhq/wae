@@ -493,6 +493,9 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => {
                 dispatch!(w => w.on_pan_gesture(dev, delta, phase).map_err(Error::PanGesture))
             }
+            WindowEvent::DoubleTapGesture { device_id: dev } => {
+                dispatch!(w => w.on_double_tap_gesture(dev).map_err(Error::DoubleTapGesture))
+            }
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new,
                 inner_size_writer: sw,
@@ -690,6 +693,9 @@ pub enum Error {
 
     #[error("couldn't handle pan gesture")]
     PanGesture(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle double tap gesture")]
+    DoubleTapGesture(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle scale factor changed")]
     ScaleFactorChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
