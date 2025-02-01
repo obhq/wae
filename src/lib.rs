@@ -503,6 +503,13 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => {
                 dispatch!(w => w.on_rotation_gesture(dev, delta, phase).map_err(Error::RotationGesture))
             }
+            WindowEvent::TouchpadPressure {
+                device_id: dev,
+                pressure,
+                stage,
+            } => {
+                dispatch!(w => w.on_touchpad_pressure(dev, pressure, stage).map_err(Error::TouchpadPressure))
+            }
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new,
                 inner_size_writer: sw,
@@ -706,6 +713,9 @@ pub enum Error {
 
     #[error("couldn't handle rotation gesture")]
     RotationGesture(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle touchpad pressure")]
+    TouchpadPressure(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle scale factor changed")]
     ScaleFactorChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
