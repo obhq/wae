@@ -139,6 +139,18 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_rotation_gesture(
+        &self,
+        dev: DeviceId,
+        delta: f32,
+        phase: TouchPhase,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = phase;
+        let _ = delta;
+        let _ = dev;
+        Ok(())
+    }
+
     fn on_scale_factor_changed(
         &self,
         new: f64,
