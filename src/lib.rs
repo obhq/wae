@@ -510,6 +510,11 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => {
                 dispatch!(w => w.on_touchpad_pressure(dev, pressure, stage).map_err(Error::TouchpadPressure))
             }
+            WindowEvent::AxisMotion {
+                device_id: dev,
+                axis,
+                value,
+            } => dispatch!(w => w.on_axis_motion(dev, axis, value).map_err(Error::AxisMotion)),
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new,
                 inner_size_writer: sw,
@@ -716,6 +721,9 @@ pub enum Error {
 
     #[error("couldn't handle touchpad pressure")]
     TouchpadPressure(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle analog motion")]
+    AxisMotion(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle scale factor changed")]
     ScaleFactorChanged(#[source] Box<dyn std::error::Error + Send + Sync>),

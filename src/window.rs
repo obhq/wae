@@ -2,7 +2,7 @@ use std::error::Error;
 use std::path::PathBuf;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::event::{
-    DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
+    AxisId, DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
     MouseScrollDelta, TouchPhase,
 };
 use winit::window::WindowId;
@@ -159,6 +159,18 @@ pub trait WindowHandler: WinitWindow {
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = stage;
         let _ = pressure;
+        let _ = dev;
+        Ok(())
+    }
+
+    fn on_axis_motion(
+        &self,
+        dev: DeviceId,
+        axis: AxisId,
+        value: f64,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = value;
+        let _ = axis;
         let _ = dev;
         Ok(())
     }
