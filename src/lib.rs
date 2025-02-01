@@ -515,6 +515,7 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
                 axis,
                 value,
             } => dispatch!(w => w.on_axis_motion(dev, axis, value).map_err(Error::AxisMotion)),
+            WindowEvent::Touch(v) => dispatch!(w => w.on_touch(v).map_err(Error::Touch)),
             WindowEvent::ScaleFactorChanged {
                 scale_factor: new,
                 inner_size_writer: sw,
@@ -724,6 +725,9 @@ pub enum Error {
 
     #[error("couldn't handle analog motion")]
     AxisMotion(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle touch")]
+    Touch(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle scale factor changed")]
     ScaleFactorChanged(#[source] Box<dyn std::error::Error + Send + Sync>),

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::event::{
     AxisId, DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
-    MouseScrollDelta, TouchPhase,
+    MouseScrollDelta, Touch, TouchPhase,
 };
 use winit::window::WindowId;
 
@@ -172,6 +172,11 @@ pub trait WindowHandler: WinitWindow {
         let _ = value;
         let _ = axis;
         let _ = dev;
+        Ok(())
+    }
+
+    fn on_touch(&self, data: Touch) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = data;
         Ok(())
     }
 
