@@ -195,6 +195,11 @@ pub trait WindowHandler: WinitWindow {
         Ok(())
     }
 
+    fn on_occluded(&self, new: bool) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = new;
+        Ok(())
+    }
+
     fn on_redraw_requested(&self) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }
