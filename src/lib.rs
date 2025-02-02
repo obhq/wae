@@ -522,6 +522,9 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             } => {
                 dispatch!(w => w.on_scale_factor_changed(new, sw).map_err(Error::ScaleFactorChanged))
             }
+            WindowEvent::ThemeChanged(v) => {
+                dispatch!(w => w.on_theme_changed(v).map_err(Error::ThemeChanged))
+            }
             WindowEvent::RedrawRequested => {
                 dispatch!(w => w.on_redraw_requested().map_err(Error::RedrawRequested))
             }
@@ -731,6 +734,9 @@ pub enum Error {
 
     #[error("couldn't handle scale factor changed")]
     ScaleFactorChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle theme changed")]
+    ThemeChanged(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle redraw requested")]
     RedrawRequested(#[source] Box<dyn std::error::Error + Send + Sync>),

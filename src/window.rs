@@ -5,7 +5,7 @@ use winit::event::{
     AxisId, DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
     MouseScrollDelta, Touch, TouchPhase,
 };
-use winit::window::WindowId;
+use winit::window::{Theme, WindowId};
 
 /// Encapsulates winit window with window-specific logic.
 ///
@@ -186,6 +186,11 @@ pub trait WindowHandler: WinitWindow {
         sw: InnerSizeWriter,
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = sw;
+        let _ = new;
+        Ok(())
+    }
+
+    fn on_theme_changed(&self, new: Theme) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = new;
         Ok(())
     }
