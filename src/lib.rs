@@ -399,6 +399,12 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
 
         // Process the event.
         let r = match event {
+            WindowEvent::ActivationTokenDone {
+                serial: s,
+                token: t,
+            } => {
+                dispatch!(w => w.on_activation_token_done(s, t).map_err(Error::ActivationTokenDone))
+            }
             WindowEvent::Resized(v) => {
                 dispatch!(w => w.on_resized(v).map_err(Error::Resized))
             }
@@ -529,7 +535,6 @@ impl<T> ApplicationHandler<Event> for Runtime<T> {
             WindowEvent::RedrawRequested => {
                 dispatch!(w => w.on_redraw_requested().map_err(Error::RedrawRequested))
             }
-            _ => Ok(()),
         };
 
         if let Err(e) = r {
@@ -663,6 +668,9 @@ pub enum Error {
 
     #[error("couldn't handle window event")]
     PreWindowEvent(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("couldn't handle activation token")]
+    ActivationTokenDone(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("couldn't handle window resized")]
     Resized(#[source] Box<dyn std::error::Error + Send + Sync>),

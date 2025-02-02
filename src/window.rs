@@ -5,12 +5,23 @@ use winit::event::{
     AxisId, DeviceId, ElementState, Ime, InnerSizeWriter, KeyEvent, Modifiers, MouseButton,
     MouseScrollDelta, Touch, TouchPhase,
 };
-use winit::window::{Theme, WindowId};
+use winit::event_loop::AsyncRequestSerial;
+use winit::window::{ActivationToken, Theme, WindowId};
 
 /// Encapsulates winit window with window-specific logic.
 ///
 /// The event loop will exit immediately if any method return an error.
 pub trait WindowHandler: WinitWindow {
+    fn on_activation_token_done(
+        &self,
+        serial: AsyncRequestSerial,
+        token: ActivationToken,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = token;
+        let _ = serial;
+        Ok(())
+    }
+
     fn on_resized(&self, new: PhysicalSize<u32>) -> Result<(), Box<dyn Error + Send + Sync>> {
         let _ = new;
         Ok(())
