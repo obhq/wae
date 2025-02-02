@@ -1,7 +1,7 @@
 # Winit Aync Executor
 [![Crates.io Version](https://img.shields.io/crates/v/wae)](https://crates.io/crates/wae)
 
-WAE is an async executor that use Winit event loop to drive the future that is ready to run.
+WAE is an async executor that use Winit event loop to drive the future that is ready to run. WAE allows you to implement your application in a usual way you implement Rust async application and all futures does not requires `Send` and `Sync` so you can to use both `Cell` and `RefCell`.
 
 ## Example
 
@@ -18,6 +18,7 @@ fn main() {
 }
 
 async fn run() {
+    // Create a window.
     let attrs = Window::default_attributes();
     let win = Rc::new(MyWindow {
         win: wae::create_window(attrs).unwrap(),
@@ -26,6 +27,8 @@ async fn run() {
 
     wae::register_window(&win);
 
+    // Wait for window to close. You can use any async library that does not requires its reactor to
+    // run on the main thread (e.g. https://crates.io/crates/async-io).
     win.close_requested.wait().await;
 }
 
